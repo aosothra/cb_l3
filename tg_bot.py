@@ -5,15 +5,14 @@ from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, Callb
 
 
 def detect_intent_texts(project_id, session_id, text, language_code):
-    """Returns the result of detect intent with texts as inputs.
+    '''Returns the result of detect intent with texts as inputs.
 
     Using the same `session_id` between requests allows continuation
-    of the conversation."""
+    of the conversation'''
 
     session_client = dialogflow.SessionsClient()
 
     session = session_client.session_path(project_id, session_id)
-    print("Session path: {}\n".format(session))
 
     text_input = dialogflow.TextInput(text=text, language_code=language_code)
 
@@ -31,7 +30,8 @@ def detect_intent_texts(project_id, session_id, text, language_code):
             response.query_result.intent_detection_confidence,
         )
     )
-    print("Fulfillment text: {}\n".format(response.query_result.fulfillment_text))
+
+    return response.query_result.fulfillment_text
 
 
 def start(update: Update, context: CallbackContext):
@@ -39,8 +39,12 @@ def start(update: Update, context: CallbackContext):
 
 
 def echo(update: Update, context: CallbackContext):
-    text = update.message.text
-    detect_intent_texts('moonlit-grail-296914', update.effective_chat.id, text, 'ru-RU')
+    text = detect_intent_texts(
+            'moonlit-grail-296914',
+            update.effective_chat.id,
+            update.message.text,
+            'ru-RU')
+    
     update.message.reply_text(text)
 
 
