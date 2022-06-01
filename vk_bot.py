@@ -8,12 +8,16 @@ from environs import Env
 from dialogflow_wrap import detect_intent_texts
 
 def echo(event, vk_api):
-    text = detect_intent_texts(
+    text, is_fallback = detect_intent_texts(
         project_id=os.getenv('GOOGLE_PROJECT_ID'),
         session_id=event.user_id,
         text=event.text,
         language_code='ru-RU'
         )
+    
+    if is_fallback:
+        vk_api.messages.markAsRead(peer_id=event.user_id)
+        return
     
     vk_api.messages.send(
         user_id=event.user_id,

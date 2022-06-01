@@ -16,7 +16,7 @@ def start(update: Update, context: CallbackContext):
 
 
 def echo(update: Update, context: CallbackContext):
-    text = detect_intent_texts(
+    text, _ = detect_intent_texts(
             project_id=os.getenv('GOOGLE_PROJECT_ID'),
             session_id=update.effective_chat.id,
             text=update.message.text,
