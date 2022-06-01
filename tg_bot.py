@@ -1,6 +1,8 @@
 import logging
 import os
+import traceback
 
+import telegram
 from environs import Env
 from telegram import Update
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
@@ -9,6 +11,21 @@ from dialogflow_utils import detect_intent_texts
 
 
 log = logging.getLogger(__file__)
+
+
+class TelegramLogHandler(logging.Handler):
+    def __init__(self, bot_token, chat_id):
+        super().__init__()
+        self.bot = telegram.Bot(bot_token)
+        self.chat_id = chat_id
+
+    def emit(self, record):
+        log_entry = self.format(record)
+
+        self.bot.send_message(
+            chat_id=self.chat_id,
+            text=log_entry
+        )
 
 
 def on_start(update: Update, context: CallbackContext):
@@ -27,8 +44,9 @@ def on_message(update: Update, context: CallbackContext):
 
 
 def on_error(updat: object, context: CallbackContext):
-    #TODO: Implement proper error logging
-    pass
+    tb_list = traceback.format_exception(None, context.error, context.error.__traceback__)
+    tb_string = ''.join(tb_list)
+    log.error(f'An exception occured while handling an event.\n{tb_string}')
 
 
 def main():
@@ -37,6 +55,9 @@ def main():
 
     logging.basicConfig(level=logging.WARNING)
     log.setLevel(logging.ERROR)
+    log.addHandler(
+        TelegramLogHandler(env('ALARM_BOT_TOKEN'), env('ALARM_CHAT_ID'))
+    )
 
     updater = Updater(env('TG_TOKEN'))
     dispatcher = updater.dispatcher
