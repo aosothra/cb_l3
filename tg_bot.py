@@ -11,11 +11,11 @@ from dialogflow_wrap import detect_intent_texts
 log = logging.getLogger(__file__)
 
 
-def start(update: Update, context: CallbackContext):
+def on_start(update: Update, context: CallbackContext):
     update.message.reply_text('Здравствуйте, задавайте вопросы.')
 
 
-def echo(update: Update, context: CallbackContext):
+def on_message(update: Update, context: CallbackContext):
     text, _ = detect_intent_texts(
             project_id=os.getenv('GOOGLE_PROJECT_ID'),
             session_id=update.effective_chat.id,
@@ -26,7 +26,7 @@ def echo(update: Update, context: CallbackContext):
     update.message.reply_text(text)
 
 
-def error_handler(updat: object, context: CallbackContext):
+def on_error(updat: object, context: CallbackContext):
     #TODO: Implement proper error logging
     pass
 
@@ -40,9 +40,9 @@ def main():
 
     updater = Updater(env('TG_TOKEN'))
     dispatcher = updater.dispatcher
-    dispatcher.add_handler(CommandHandler('start', start))
-    dispatcher.add_handler(MessageHandler(Filters.text & ~Filters.command, echo))
-    dispatcher.add_error_handler(error_handler)
+    dispatcher.add_handler(CommandHandler('start', on_start))
+    dispatcher.add_handler(MessageHandler(Filters.text & ~Filters.command, on_message))
+    dispatcher.add_error_handler(on_error)
 
     updater.start_polling()
     updater.idle()

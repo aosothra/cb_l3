@@ -7,7 +7,8 @@ from environs import Env
 
 from dialogflow_wrap import detect_intent_texts
 
-def echo(event, vk_api):
+
+def handle_message(event, vk_api):
     text, is_fallback = detect_intent_texts(
         project_id=os.getenv('GOOGLE_PROJECT_ID'),
         session_id=event.user_id,
@@ -36,7 +37,7 @@ def main():
     longpoll = VkLongPoll(vk_session)
     for event in longpoll.listen():
         if event.type == VkEventType.MESSAGE_NEW and event.to_me:
-            echo(event, vk_api)
+            handle_message(event, vk_api)
 
 
 if __name__ == '__main__':
