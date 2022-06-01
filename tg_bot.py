@@ -7,25 +7,10 @@ from environs import Env
 from telegram import Update
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
 
-from dialogflow_utils import detect_intent_texts
+from bot_utils import TelegramLogHandler, detect_intent_texts
 
 
 log = logging.getLogger(__file__)
-
-
-class TelegramLogHandler(logging.Handler):
-    def __init__(self, bot_token, chat_id):
-        super().__init__()
-        self.bot = telegram.Bot(bot_token)
-        self.chat_id = chat_id
-
-    def emit(self, record):
-        log_entry = self.format(record)
-
-        self.bot.send_message(
-            chat_id=self.chat_id,
-            text=log_entry
-        )
 
 
 def on_start(update: Update, context: CallbackContext):

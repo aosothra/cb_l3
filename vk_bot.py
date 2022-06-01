@@ -1,11 +1,15 @@
+import logging
 import os
 import random
 
 import vk_api as vk
-from vk_api.longpoll import VkLongPoll, VkEventType
 from environs import Env
+from vk_api.longpoll import VkLongPoll, VkEventType
 
-from dialogflow_utils import detect_intent_texts
+from bot_utils import detect_intent_texts, TelegramLogHandler
+
+
+log = logging.getLogger(__file__)
 
 
 def handle_message(event, vk_api):
@@ -31,13 +35,22 @@ def main():
     env = Env()
     env.read_env()
 
+    logging.basicConfig(level=logging.WARNING)
+    log.setLevel(logging.ERROR)
+    log.addHandler(
+        TelegramLogHandler(env('ALARM_BOT_TOKEN'), env('ALARM_CHAT_ID'))
+    )
+
     vk_session = vk.VkApi(token=env('VK_ACCESS_TOKEN'))
     vk_api = vk_session.get_api()
 
     longpoll = VkLongPoll(vk_session)
     for event in longpoll.listen():
         if event.type == VkEventType.MESSAGE_NEW and event.to_me:
-            handle_message(event, vk_api)
+            try:
+                handle_message(event, vk_api)
+            except Exception:
+                log.exception('An exception occured while handling a message.')
 
 
 if __name__ == '__main__':
