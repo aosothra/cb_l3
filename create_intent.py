@@ -16,8 +16,13 @@ def main():
     with open(args.path_to_json, 'r', encoding='utf-8') as intents_file:
         intents_to_add = json.load(intents_file)
     
-    for name, content in intents_to_add.items():
-        create_intent('moonlit-grail-296914', name, content['questions'], content['answer'])
+    for display_name, content in intents_to_add.items():
+        create_intent(
+            project_id=env('GOOGLE_PROJECT_ID'),
+            display_name=display_name,
+            training_phrases_parts=content['questions'],
+            message_texts=content['answer']
+            )
 
 
 if __name__ == '__main__':
