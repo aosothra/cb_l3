@@ -2,7 +2,7 @@ import json
 from argparse import ArgumentParser
 
 from environs import Env
-from bot_utils import create_intent
+from dialogflow_wrappers import create_intent
 
 
 def main():
