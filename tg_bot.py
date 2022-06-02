@@ -29,9 +29,7 @@ def on_message(update: Update, context: CallbackContext):
 
 
 def on_error(updat: object, context: CallbackContext):
-    tb_list = traceback.format_exception(None, context.error, context.error.__traceback__)
-    tb_string = ''.join(tb_list)
-    log.error(f'An exception occured while handling an event.\n{tb_string}')
+    log.exception('An exception occured while handling an event.')
 
 
 def main():
